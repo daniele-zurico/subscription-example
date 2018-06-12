@@ -39,6 +39,9 @@ const schema: GraphQLSchema = mergeSchemas({
 const server = new ApolloServer({
 	schema,
 	context: async ({ req }: any) => {
+		if (!req || !req.headers) {
+      		return;
+    	}
 		const token = req.headers.authorization || "";
 		const checkToken = await userController.findOrCreateUser(token);
 		if (!checkToken.hasOwnProperty('authorized')) {
@@ -51,38 +54,4 @@ const server = new ApolloServer({
 
 server.listen().then(({ url }) => {
 	console.log(`🚀 Server ready at ${url}`);
-});
-
-/*****************************************************/
-/*********			SUBSCRIPTIONS			**********/
-/*****************************************************/
-const PORT = 5000;
-const app = express();
-
-app.use('*', cors({ origin: 'http://localhost:5000' }));
-
-app.use('/graphql', bodyParser.json(), graphqlExpress({
-  schema
-}));
-
-app.use('/graphiql', graphiqlExpress({
-  endpointURL: '/graphql',
-  subscriptionsEndpoint: `ws://localhost:5000/subscriptions`
-}));
-
-// We wrap the express server so that we can attach the WebSocket for subscriptions
-const ws = createServer(app);
-
-ws.listen(PORT, () => {
-  console.log(`GraphQL Server is now running on http://localhost:${PORT}`);
-
-  // Set up the WebSocket for handling GraphQL subscriptions
-  new SubscriptionServer({
-    execute,
-    subscribe,
-    schema
-  }, {
-    server: ws,
-    path: '/subscriptions',
-  });
 });
