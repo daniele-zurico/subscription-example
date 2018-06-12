@@ -23,7 +23,7 @@ const MONGO_PORT = 27017;
 const MONGO_URL = "localhost";
 const dbName = "graphExample";
 export const CLIENT_ID =
-	"580194604079-dpddj213jsbl14rq47s4j7773n6tceo0.apps.googleusercontent.com";
+	"YOUR_ID";
 export const client = new OAuth2Client(CLIENT_ID);
 // help to debug mongoose
 mongoose.set("debug", true);
